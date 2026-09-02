@@ -1,0 +1,6 @@
+gradio==6.26.0
+pydantic==2.13.4
+python-dotenv==1.2.1
+socksio==1.0.0
+ddgs==9.16.0
+openai==3.7.0
