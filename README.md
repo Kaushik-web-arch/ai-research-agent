@@ -177,6 +177,8 @@ and verify the claims directly before relying on a generated report.
 - Optional local-model writing through Ollama
 - Docker packaging and deployment profiles
 
-## License
+## Copyright
 
-This project is released under the [MIT License](LICENSE).
+© 2026 **Kaushik Santhosh**. All rights reserved.
+
+This repository and its source code are provided publicly for portfolio, educational review, and demonstration purposes. No permission is granted to copy, modify, redistribute, sublicense, or use substantial portions of this project without prior written permission from the copyright holder.
