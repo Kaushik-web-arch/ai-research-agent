@@ -5,9 +5,9 @@ report. The application plans focused searches, collects current web evidence, e
 content, synthesizes the findings for a chosen audience, caches completed work locally and exports a
 downloadable report.
 
-The project is designed for a zero-cost local workflow: Gemini 3.5 Flash-Lite handles text planning and
-report writing on its free tier, while DDGS provides keyless live metasearch without requesting
-Gemini's paid Google Search grounding tool.
+The project is designed for local use with Gemini planning and report writing plus keyless DDGS
+metasearch. The configured model is Gemini 3.5 Flash-Lite. Model availability, account quotas and
+billing depend on the provider; this code does not request the Google Search grounding tool.
 
 ## Highlights
 
@@ -21,7 +21,7 @@ Gemini's paid Google Search grounding tool.
 - **Markdown export:** every successful report is saved as a downloadable file
 - **Fault tolerance:** successful searches survive when another search fails
 - **Prompt-injection guardrails:** webpage content is treated as untrusted evidence
-- **Network safeguards:** localhost, private and link-local IP targets are rejected
+- **URL safeguards:** localhost names and non-public literal IP addresses are rejected
 - **Responsive Gradio interface:** a polished research workspace for desktop and laptop use
 - **Offline unit tests:** core behavior can be verified without using API quota
 
@@ -52,7 +52,7 @@ flowchart TD
 | Standard | 3 | 5 | 2 per search | ~1,000 words | 2 |
 | Deep | 4 | 6 | 2 per search | ~1,400 words | 2 |
 
-Every fresh run uses one Gemini request for planning and one for writing. Web research does not use a
+A successful uncached run uses one Gemini request for planning and one for writing. Web research does not use a
 Gemini grounding request. A matching cached report uses no new Gemini requests.
 
 ## Technology stack
@@ -148,7 +148,7 @@ ai-research-agent/
 ## Reliability and safety
 
 - Search and page content are considered untrusted data, never instructions.
-- Only valid public HTTP/HTTPS source URLs enter the report pipeline.
+- Source URLs are checked for HTTP/HTTPS syntax, localhost names and non-public literal IP addresses.
 - Page extraction is bounded to keep prompts and free-tier token use controlled.
 - A failed page extraction falls back to its search snippet.
 - A failed individual search does not discard other successful findings.
@@ -176,6 +176,22 @@ and verify the claims directly before relying on a generated report.
 - Research history with side-by-side report comparison
 - Optional local-model writing through Ollama
 - Docker packaging and deployment profiles
+
+## Evidence and verification
+
+The implementation is a three-stage workflow in [research_manager.py](research_manager.py), with typed records in [models.py](models.py) and cache/export handling in [storage.py](storage.py). It demonstrates LLM orchestration and web-evidence collection; it does not independently verify every generated claim or citation. Prompt instructions reduce risk but do not guarantee factual accuracy or immunity to prompt injection.
+
+URL checks reject unsupported schemes, localhost names and non-public literal IP addresses. They do not implement DNS-resolution or redirect-target validation and should not be described as complete SSRF protection.
+
+### Reproducible demonstration
+
+1. Run the offline test command above, then run the connection checker separately. Record the commit, Python version and actual results.
+2. In Quick mode, ask: "Compare SQLite and PostgreSQL for a small single-user application." Export the resulting Markdown.
+3. Open each cited source and check whether it supports the associated claims. Record unsupported claims and broken links.
+4. Repeat the same question with the same mode, audience, style and model while the cache is valid. Confirm the cached-result status.
+5. Enable a fresh search and confirm the workflow runs again.
+
+These are verification instructions, not recorded results. A published sample report should include its generation date, configured model and manual citation review. No measured speedup, factual-accuracy score or user-adoption result is claimed here.
 
 ## Copyright
 
